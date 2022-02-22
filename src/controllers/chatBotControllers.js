@@ -1,7 +1,7 @@
 require("dotenv").config();
 const request = require('request');
-const moment = require('moment');
 const { isDateValid, getNumberOfDaysLeftForBirthday } = require("./helpers");
+const { getUserDetailsUsingPsid } = require("./user");
 
 
 const getHomePage = (req, res) => {
@@ -34,7 +34,7 @@ const getWebhook = (req, res) => {
     }
 }
 
-const postWebhook = (req, res) => {
+const postWebhook = async (req, res) => {
     // Parse the request body from the POST
     let body = req.body;
 
@@ -42,7 +42,7 @@ const postWebhook = (req, res) => {
     if (body.object === 'page') {
 
         // Iterate over each entry - there may be multiple if batched
-        body.entry.forEach(function (entry) {
+        body.entry.forEach(async(entry) => {
 
             // Get the webhook event. entry.messaging is an array, but 
             // will only ever contain one event, so we get index 0
@@ -51,6 +51,7 @@ const postWebhook = (req, res) => {
 
             // Get sender psid
             const senderPsid = webhook_event.sender.id;
+            const userData = await getUserDetailsUsingPsid(senderPsid);
             if(webhook_event.message) {
                 handleMessage(senderPsid, webhook_event.message);
             } else if(webhook_event.postback) {
@@ -94,7 +95,6 @@ function handlePostback(sender_psid, received_postback) {
 
 const handleMessage = (senderPsid, message) => {
     let response;
-    console.log(message, 'xxxxxx');
     if(message && message.text) {
         const isDateAvailable = message.text.split(',')
         .map(item => item.trim())
@@ -180,7 +180,7 @@ let callSendAPIWithTemplate = (senderPsid, birthdate) => {
         "json": body
     }, (err, res, body) => {
         if (!err) {
-            // console.log('message sent!')
+            console.log('message sent!')
         } else {
             console.error("Unable to send message:" + err);
         }

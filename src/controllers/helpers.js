@@ -1,7 +1,6 @@
 const moment = require('moment');
 
 const isDateValid = (date) => {
-    console.log(date, 'zzzzzzzz');
     return moment(date, 'DD/MM/YYYY', true).isValid()
         || moment(date, 'DD-MM-YYYY', true).isValid()
         || moment(date, 'YYYY/MM/DD', true).isValid()
