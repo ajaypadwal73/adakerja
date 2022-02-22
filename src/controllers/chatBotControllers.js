@@ -1,7 +1,8 @@
 require("dotenv").config();
 const request = require('request');
 const { isDateValid, getNumberOfDaysLeftForBirthday } = require("./helpers");
-const { getUserDetailsUsingPsid } = require("./user");
+const { saveMessageToDb } = require("./message");
+const { getUserDetailsUsingPsid, addUserDetailsToDB } = require("./user");
 
 
 const getHomePage = (req, res) => {
@@ -52,6 +53,7 @@ const postWebhook = async (req, res) => {
             // Get sender psid
             const senderPsid = webhook_event.sender.id;
             const userData = await getUserDetailsUsingPsid(senderPsid);
+            await addUserDetailsToDB(senderPsid, userData);
             if(webhook_event.message) {
                 handleMessage(senderPsid, webhook_event.message);
             } else if(webhook_event.postback) {
@@ -91,6 +93,7 @@ function handlePostback(sender_psid, received_postback) {
     }
     // Send the message to acknowledge the postback
     callSendApi(sender_psid, response);
+    saveMessageToDb(sender_psid, received_postback.mid, payload);
 }
 
 const handleMessage = (senderPsid, message) => {
@@ -112,7 +115,9 @@ const handleMessage = (senderPsid, message) => {
             response = 'I did not understand. Please type "hi" to start the conversation.';
             callSendApi(senderPsid, response);
         }
-    } 
+    }
+    saveMessageToDb(senderPsid, message.mid, message.text);
+
 }
 
 const callSendApi = (senderPsid, response) => {
