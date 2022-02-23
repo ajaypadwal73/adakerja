@@ -89,7 +89,7 @@ function handlePostback(sender_psid, received_postback) {
 
         response = `There are ${daysLeftForBirthday} day(s) left until your next birthday`;
     } else if (payload === 'no') {
-        response = "Bye! Nice chatting with you! Goodbye";
+        response = "Nice chatting with you! Goodbye";
     }
     // Send the message to acknowledge the postback
     callSendApi(sender_psid, response);
