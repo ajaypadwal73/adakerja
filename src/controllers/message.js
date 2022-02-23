@@ -17,13 +17,13 @@ const saveMessageToDb = async (senderId, messageId, message) => {
 const getAllMessagesFromDB = async (req, res) => {
     try {
         let messageObj = await Message.find();
-        if(!messageObj) {
+        if (!messageObj) {
             res.status(404).json({
                 message: 'No messages found'
             });
         } else {
             res.status(200).json(messageObj);
-        }    
+        }
     } catch (error) {
         res.status(500).json({
             message: error.message
@@ -35,7 +35,7 @@ const getMessageFromDBById = async (req, res) => {
     try {
         const messageId = req.params.id;
         let messageObj = await Message.findOne({ messageId: messageId });
-        if(!messageObj) {
+        if (!messageObj) {
             res.status(404).json({
                 message: 'message not found'
             });

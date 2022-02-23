@@ -23,7 +23,7 @@ const getNumberOfDaysLeftForBirthday = (birthDate) => {
     const daysLeftForNextYearBirthday = birthDateForNextYear.diff(currentDate, 'days');
 
     let daysLeftForBirthday;
-    if(daysLeftForCurrentYearBirthday > 0) {
+    if (daysLeftForCurrentYearBirthday > 0) {
         daysLeftForBirthday = daysLeftForCurrentYearBirthday;
     } else {
         daysLeftForBirthday = daysLeftForNextYearBirthday;

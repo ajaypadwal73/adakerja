@@ -43,7 +43,7 @@ const postWebhook = async (req, res) => {
     if (body.object === 'page') {
 
         // Iterate over each entry - there may be multiple if batched
-        body.entry.forEach(async(entry) => {
+        body.entry.forEach(async (entry) => {
 
             // Get the webhook event. entry.messaging is an array, but 
             // will only ever contain one event, so we get index 0
@@ -54,9 +54,9 @@ const postWebhook = async (req, res) => {
             const senderPsid = webhook_event.sender.id;
             const userData = await getUserDetailsUsingPsid(senderPsid);
             await addUserDetailsToDB(senderPsid, userData);
-            if(webhook_event.message) {
+            if (webhook_event.message) {
                 handleMessage(senderPsid, webhook_event.message);
-            } else if(webhook_event.postback) {
+            } else if (webhook_event.postback) {
                 handlePostback(senderPsid, webhook_event.postback);
             }
 
@@ -80,7 +80,7 @@ function handlePostback(sender_psid, received_postback) {
     // Set the response based on the postback payload
     // Do calculations based on the postback payload
     if (payload.toLowerCase().includes('yes')) {
-        
+
         const validDate = payload.split(',')
             .map(item => item.trim())
             .filter(item => isDateValid(item))
@@ -98,18 +98,18 @@ function handlePostback(sender_psid, received_postback) {
 
 const handleMessage = (senderPsid, message) => {
     let response;
-    if(message && message.text) {
+    if (message && message.text) {
         const isDateAvailable = message.text.split(',')
-        .map(item => item.trim())
-        .some(item => isDateValid(item));
+            .map(item => item.trim())
+            .some(item => isDateValid(item));
 
-        if(message.text.toLowerCase() === 'hi') {
+        if (message.text.toLowerCase() === 'hi') {
             response = 'Hi, may I know your name and birth-date?\neg: John Smith, YYYY-MM-DD';
             callSendApi(senderPsid, response);
-        } else if(isDateAvailable) {
+        } else if (isDateAvailable) {
             const validDate = message.text.split(',')
-            .map(item => item.trim())
-            .filter(item => isDateValid(item))
+                .map(item => item.trim())
+                .filter(item => isDateValid(item))
             callSendAPIWithTemplate(senderPsid, validDate[0]);
         } else {
             response = 'I did not understand. Please type "hi" to start the conversation.';
