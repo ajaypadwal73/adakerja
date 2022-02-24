@@ -1,0 +1,7 @@
+curl --location --request GET 'https://adakerja-chatbot.herokuapp.com/messages'
+
+
+curl --location --request GET 'https://adakerja-chatbot.herokuapp.com/summary'
+
+
+curl --location --request GET 'https://adakerja-chatbot.herokuapp.com/message/m_woXE_vR99jZViGcOSPkIz2QL21r7VDHUhliwo4JHxAConGpn_FLqlnebZAmnqRRoc94csnGWb7sWdw0DFJCNJA'
