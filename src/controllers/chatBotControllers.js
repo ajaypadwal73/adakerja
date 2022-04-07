@@ -1,8 +1,9 @@
 require("dotenv").config();
 const request = require('request');
-const { isDateValid, getNumberOfDaysLeftForBirthday } = require("./helpers");
+const { wordsSimilarToYes, wordsSimilarToNo } = require("../dict");
+const { isDateValid, getNumberOfDaysLeftForBirthday, isDateAvailableInMsg, getValidDateFromMsg } = require("./helpers");
 const { saveMessageToDb } = require("./message");
-const { getUserDetailsUsingPsid, addUserDetailsToDB } = require("./user");
+const { getUserDetailsUsingPsid, addUserDetailsToDB, getLastMessageFromDB } = require("./user");
 
 
 const getHomePage = (req, res) => {
@@ -96,22 +97,40 @@ function handlePostback(sender_psid, received_postback) {
     saveMessageToDb(sender_psid, received_postback.mid, payload);
 }
 
-const handleMessage = (senderPsid, message) => {
+const handleMessage = async(senderPsid, message) => {
     let response;
     if (message && message.text) {
-        const isDateAvailable = message.text.split(',')
-            .map(item => item.trim())
-            .some(item => isDateValid(item));
-
+        const isDateAvailable = isDateAvailableInMsg(message.text);
         if (message.text.toLowerCase() === 'hi') {
+        // if message contains hi    
             response = 'Hi, may I know your name and birth-date?\neg: John Smith, YYYY-MM-DD';
             callSendApi(senderPsid, response);
         } else if (isDateAvailable) {
-            const validDate = message.text.split(',')
-                .map(item => item.trim())
-                .filter(item => isDateValid(item))
+        // if message contains date
+            const validDate = getValidDateFromMsg(message.text);
             callSendAPIWithTemplate(senderPsid, validDate[0]);
+        } else if(wordsSimilarToYes.includes(message.text.toLowerCase())) {
+        // if message contains yes    
+            const { message: lastMessageForThatUser } = await getLastMessageFromDB(senderPsid);
+            console.log('Users last message was: ', lastMessageForThatUser);
+            const isDateAvailableInLastMessage = isDateAvailableInMsg(lastMessageForThatUser);
+            // if last message contains date
+            if (isDateAvailableInLastMessage) {
+                const validDate = getValidDateFromMsg(lastMessageForThatUser);
+                const daysLeftForBirthday = getNumberOfDaysLeftForBirthday(validDate[0]);
+                response = `There are ${daysLeftForBirthday} day(s) left until your next birthday`;
+                callSendApi(senderPsid, response);
+            } else {
+            // if last message contains no date    
+                response = "Hi, may I know your name and birth-date?\neg: John Smith, YYYY-MM-DD";
+                callSendApi(senderPsid, response);
+            }
+        } else if(wordsSimilarToNo.includes(message.text.toLowerCase())) {
+        // if message contains no    
+            response = "Nice chatting with you! Goodbye";
+            callSendApi(senderPsid, response);
         } else {
+        // if message contains anything else    
             response = 'I did not understand. Please type "hi" to start the conversation.';
             callSendApi(senderPsid, response);
         }

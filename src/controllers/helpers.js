@@ -31,7 +31,16 @@ const getNumberOfDaysLeftForBirthday = (birthDate) => {
     return daysLeftForBirthday;
 }
 
+const isDateAvailableInMsg = (message) => {
+    return message.split(',').map(item => item.trim()).some(item => isDateValid(item));
+}
+
+const getValidDateFromMsg = (message) => {
+    return message.split(',').map(item => item.trim()).filter(item => isDateValid(item));
+}
 module.exports = {
     isDateValid,
-    getNumberOfDaysLeftForBirthday
+    getNumberOfDaysLeftForBirthday,
+    isDateAvailableInMsg,
+    getValidDateFromMsg,
 }
