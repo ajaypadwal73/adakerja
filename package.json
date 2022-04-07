@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "jest",
+    "test": "jest --detectOpenHandles",
     "start": "node src/server.js",
     "dev": "nodemon src/server.js"
   },
@@ -27,6 +27,7 @@
     "moment": "^2.29.1",
     "mongoose": "^6.2.3",
     "nodemon": "^2.0.15",
-    "request": "^2.88.2"
+    "request": "^2.88.2",
+    "supertest": "^6.2.2"
   }
 }
